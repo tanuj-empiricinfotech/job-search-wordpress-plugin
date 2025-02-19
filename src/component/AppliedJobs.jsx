@@ -4,6 +4,7 @@ import { timeAgo } from '../helper';
 
 const GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL = "https://api.headhuntrai.com/api/job-searches/<campaign_id>/appliedJobs/";
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL = "https://api.headhuntrai.com/api/job-searches/<user_id>/activeJobs/";
+const GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY = `https://headhuntrai.com/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
 const UPDATE_LIKE_STATUS_OF_JOB_URL = "https://api.headhuntrai.com/api/like-status/<job_id>/";
 const APPLY_TO_JOB_URL = "https://api.headhuntrai.com/api/apply-status/<job_id>/";
 const GENERATE_FILES_URL = "https://api.headhuntrai.com/api/generate-resume/<job_id>/";
@@ -39,14 +40,15 @@ function AppliedJobs({ globalAuthUserDetails }) {
 
     const fetchActiveCampaignDetails = async () => {
         setAllDetailsLoading(true);
-        const finalURL = GET_ACTIVE_CAMPAIGN_DETAIL_URL.replace("<user_id>", globalAuthUserDetails?.id);
+        const finalURL = GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY.replace("<user_id>", globalAuthUserDetails?.id);
         try {
             const response = await axios.get(finalURL);
-            // console.log(response?.data?.campaign?.id);
-            // console.log('calling fetchActiveCampaignAppliedJobDetails with ', response?.data?.campaign?.id);
-            if (response?.data?.campaign?.id) fetchActiveCampaignAppliedJobDetails(response?.data?.campaign?.id);
+            const data = typeof response?.data === 'string' ? JSON.parse(response?.data) : response?.data;
+            // console.log(data?.campaign?.id);
+            // console.log('calling fetchActiveCampaignAppliedJobDetails with ', data?.campaign?.id);
+            if (data?.campaign?.id) fetchActiveCampaignAppliedJobDetails(data?.campaign?.id);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error?.message);
             // if (error?.response?.data?.detail) {
             //     setNoActiveCampaign(true);
             // }

@@ -9,6 +9,7 @@ import axios from 'axios';
 
 const BASE_URL = 'https://api.headhuntrai.com/api';
 const GET_ACTIVE_CAMPAIGN_DETAILS_URL = `${BASE_URL}/job-searches/<user_id>/activeJobs/`;
+const GET_ACTIVE_CAMPAIGN_DETAILS_URL_PROXY = `https://headhuntrai.com/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
 const SET_CAMPAIGNS_AS_READ = `${BASE_URL}/update-job-notification/`;
 
 const Layout = () => {
@@ -65,17 +66,21 @@ const Layout = () => {
 
 
     const fetchActiveCampaignDetails = async () => {
-        const finalURL = GET_ACTIVE_CAMPAIGN_DETAILS_URL.replace("<user_id>", globalAuthUserDetails?.id);
+        const finalURL = GET_ACTIVE_CAMPAIGN_DETAILS_URL_PROXY.replace("<user_id>", globalAuthUserDetails?.id);
         try {
             const response = await axios.get(finalURL);
-            if (response?.data?.campaign) {
+            console.log('response?.data?.campaign', response, typeof response?.data);
+
+            if (response?.data) {
+                const data = typeof response?.data === 'string' ? JSON.parse(response?.data) : response?.data;
+                console.log('response?.data?.campaign parsed', data);
                 setHasActiveCampaign(true);
-                const hasUnreadcampaign = response?.data?.jobs?.filter((job) => job?.is_notified === false ? job?.search : null).filter((id => id !== null)) || [];
-                setUnreadCampaigns(response?.data?.jobs);
+                const hasUnreadcampaign = data?.jobs?.filter((job) => job?.is_notified === false ? job?.search : null).filter((id => id !== null)) || [];
+                setUnreadCampaigns(data?.jobs);
                 setUnreadCampaigns(hasUnreadcampaign);
             }
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error?.message);
         }
     }
 
@@ -104,7 +109,7 @@ const Layout = () => {
                                 className={`flex gap-3 justify-center items-center p-4 px-8 !cursor-pointer w-full text-center ${tabIsSelected ? '!border-solid !border-b-2 !border-b-brand-primary' : ''} `}
                                 onClick={(e) => {
                                     setSelectedTab(tab.value);
-                                    if(typeof tab?.onClick === "function") tab.onClick();
+                                    if (typeof tab?.onClick === "function") tab.onClick();
                                 }}
                             >
                                 {tab.icon && tab.icon}

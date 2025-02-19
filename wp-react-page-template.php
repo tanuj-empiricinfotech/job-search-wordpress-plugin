@@ -237,6 +237,12 @@ add_action( 'rest_api_init', function () {
         'callback' => 'get_cities_list_proxy', // Callback function to handle requests
         'permission_callback' => '__return_true', // Set permissions (adjust as needed)
     ) );
+    
+    register_rest_route( 'job-search/v1', '/active-jobs-proxy/(?P<user_id>\d+)', array( // Define endpoint and parameter
+        'methods'  => 'GET', // Accept GET requests
+        'callback' => 'get_active_jobs_proxy', // Callback function to handle requests
+        'permission_callback' => '__return_true', // Set permissions (adjust as needed)
+    ) );
 });
   
 function fetch_country_list_proxy( WP_REST_Request $request ) {
@@ -281,4 +287,30 @@ function get_cities_list_proxy( $request ) {
     }
 
     return rest_ensure_response( $data ); // Return the data as a REST API response
+}
+
+function get_active_jobs_proxy( $request ) {
+    $user_id = $request['user_id'];
+    $api_url = str_replace( '<user_id>', $user_id, 'https://api.headhuntrai.com/api/job-searches/<user_id>/activeJobs/' );
+
+    $response = wp_remote_get( $api_url );
+
+    if ( is_wp_error( $response ) ) {
+        return new WP_Error( 'api_error', 'Error fetching active jobs list from external API', array( 'status' => 500 ) );
+    }
+
+    $body = wp_remote_retrieve_body( $response );
+    $status  = wp_remote_retrieve_response_code( $response );
+    $headers = wp_remote_retrieve_headers( $response );
+    $data = json_decode( $body, true ); // Decode JSON response
+
+    if ( json_last_error() !== JSON_ERROR_NONE ) {
+        return new WP_Error( 'json_error', 'Error decoding JSON response from external API', array( 'status' => 500 ) );
+    }
+
+    if ($status !== 200) {
+        return new WP_Error( 'error', $data, array( 'status' => $status ) );
+    }
+
+    return rest_ensure_response($data);
 }

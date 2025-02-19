@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { timeAgo } from '../helper';
 
 const GET_ACTIVE_CAMPAIGN_DETAILS_URL = "https://api.headhuntrai.com/api/job-searches/<user_id>/activeJobs/";
+const GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY = `https://headhuntrai.com/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
 const UPDATE_LIKE_STATUS_OF_JOB_URL = "https://api.headhuntrai.com/api/like-status/<job_id>/";
 const APPLY_TO_JOB_URL = "https://api.headhuntrai.com/api/apply-status/<job_id>/";
 const GENERATE_FILES_URL = "https://api.headhuntrai.com/api/generate-resume/<job_id>/";
@@ -24,10 +25,11 @@ function ActiveCampaign({ globalAuthUserDetails }) {
 
     const fetchActiveCampaignDetails = async () => {
         setActiveCampaignLoading(true);
-        const finalURL = GET_ACTIVE_CAMPAIGN_DETAILS_URL.replace("<user_id>", globalAuthUserDetails?.id);
+        const finalURL = GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY.replace("<user_id>", globalAuthUserDetails?.id);
         try {
             const response = await axios.get(finalURL);
-            setActiveCampaignDetails(response?.data);
+            const data = typeof response?.data === 'string' ? JSON.parse(response?.data) : response?.data;
+            setActiveCampaignDetails(data);
         } catch (error) {
             console.error('Error fetching data:', error);
             if (error?.response?.data?.detail) {
@@ -292,7 +294,7 @@ function ActiveCampaign({ globalAuthUserDetails }) {
                                 <span className="!w-1/2 min-w-44 px-4 py-2 mx-auto !cursor-pointer !border !border-gray-300 !rounded-md !text-sm !font-medium !text-gray-700 hover:!bg-gray-50 focus:outline-none" onClick={fetchActiveCampaignDetails}>Refresh</span>
                             </div>
                         ) : (
-                            <span className="block py-6 pt-2 text-center">No Jobs to display</span>
+                            <span className="block py-6 mt-4 text-center">No Jobs to display</span>
                         )
                     }
                 </div>
