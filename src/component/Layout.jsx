@@ -69,11 +69,9 @@ const Layout = () => {
         const finalURL = GET_ACTIVE_CAMPAIGN_DETAILS_URL_PROXY.replace("<user_id>", globalAuthUserDetails?.id);
         try {
             const response = await axios.get(finalURL);
-            console.log('response?.data?.campaign', response, typeof response?.data);
 
             if (response?.data) {
                 const data = typeof response?.data === 'string' ? JSON.parse(response?.data) : response?.data;
-                console.log('response?.data?.campaign parsed', data);
                 setHasActiveCampaign(true);
                 const hasUnreadcampaign = data?.jobs?.filter((job) => job?.is_notified === false ? job?.search : null).filter((id => id !== null)) || [];
                 setUnreadCampaigns(data?.jobs);

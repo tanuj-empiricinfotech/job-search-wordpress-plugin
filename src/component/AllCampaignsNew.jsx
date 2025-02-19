@@ -1,13 +1,10 @@
-import { Button } from "primereact/button";
-import "./AllCampaigns.css"
 import axios from 'axios';
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
-import React, { useEffect, useState } from 'react'
-import { CirclePause, CircleStop, Power } from "lucide-react";
 import { Dialog } from "primereact/dialog";
+import React, { useEffect, useState } from 'react';
+import "./AllCampaigns.css";
 
 const GET_USERS_CAMPAIGN_LIST_URL = "https://api.headhuntrai.com/api/campaign-list/<user_id>/";
+const GET_USERS_CAMPAIGN_LIST_URL_PROXY = '/wp-json/job-search/v1/campaigns-list-proxy/<user_id>/';
 const GET_CAMPAIGN_DETAIL_URL = "https://api.headhuntrai.com/api/job-searches/<campaign_id>/allJobs/";
 const CHANGE_CAMPAIGN_OVERALL_OR_EMAIL_STATUS_URL = "https://api.headhuntrai.com/api/campaign/<campaign_id>/status/";
 
@@ -420,7 +417,7 @@ function AllCampaignsNew({ globalAuthUserDetails, setSelectedTab }) {
 
     const fetchAllCampaigns = async () => {
         setCampaignDetailsLoading(true);
-        const finalURL = GET_USERS_CAMPAIGN_LIST_URL.replace("<user_id>", globalAuthUserDetails?.id);
+        const finalURL = GET_USERS_CAMPAIGN_LIST_URL_PROXY.replace("<user_id>", globalAuthUserDetails?.id);
         try {
             const response = await axios.get(finalURL);
             setAllCampaignDetails(response?.data);
