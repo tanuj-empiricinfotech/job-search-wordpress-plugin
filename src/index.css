@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "primeicons/primeicons.css";
+
+@theme {
+    --color-brand-orange: #FF6F61;
+}
+
+.container {
+    max-width: 1180px;
+    margin: auto;
+}
+
+.custom-shadow {
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.flex-wrap {
+    flex-wrap: wrap !important;
+}
+
+.text-xxs {
+    font-size: 0.55rem;
+    line-height: 1rem;
+}
+
+.grayscale {
+    filter: grayscale(100%) !important;
+    cursor: not-allowed !important;
+    background-color: #f0f0f0 !important;
+}
+
+.relative {
+    position: relative !important;
+}
+
+.notification-ping,
+.notification-ping-big {
+    width: 6px;
+    height: 6px;
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    border-radius: 100px !important;
+    background-color: #ff6f61 !important;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite !important;
+}
+
+.notification-ping-big {
+    width: 20px;
+    height: 20px;
+    top: -5px;
+    right: -5px;
+}
+
+.notification-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: red;
+    color: white;
+    font-size: 0.75rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.custom-radius-padding {
+    padding: 4px !important;
+}
+
+@keyframes ping {
+
+    75%,
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+@media (min-width: 640px) {
+    .custom-text-xl {
+        font-size: 1.25rem
+            /* 20px */
+            !important;
+        line-height: 1.75rem
+            /* 28px */
+            !important;
+    }
+
+    .custom-radius-padding {
+        padding: 8px !important;
+    }
+}
+
+/* Force left padding for Select2 search input */
+/* .select2-container .select2-search__field {
+    padding-left: 12px !important;
+} */
+
+/* ✅ Fix for Hidden First Letter Issue */
+/* .select2-container .custom-country-select2-dropdown .select2-search__field {
+    padding-left: 8px !important;
+} */
+/* .select2-container .custom-country-select2-dropdown,
+.select2-container .custom-city-select2-dropdown {
+    margin-top: 50px !important;
+} */
+
+.select2-container--open .select2-dropdown,
+.select2-container--open .custom-country-select2-dropdown,
+.select2-container--open .custom-city-select2-dropdown {
+    top: 50px !important;
+}
+
+.select2-container--open .custom-country-select2-dropdown .select2-search__field {
+    padding-left: 8px !important;
+}
+
+.select2-container--open .custom-city-select2-dropdown .select2-search__field {
+    padding-left: 8px !important;
+}
+
+
+/* .elementor.elementor-129 {
+    display: none !important;
+} */
+
+#react-page-template+.elementor.elementor-129 {
+    display: none !important;
+}
