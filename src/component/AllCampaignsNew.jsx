@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import "./AllCampaigns.css";
 
 const GET_USERS_CAMPAIGN_LIST_URL = "https://api.headhuntrai.com/api/campaign-list/<user_id>/";
-const GET_USERS_CAMPAIGN_LIST_URL_PROXY = '/wp-json/job-search/v1/campaigns-list-proxy/<user_id>/';
+const GET_USERS_CAMPAIGN_LIST_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/campaigns-list-proxy/<user_id>/`;
 const GET_CAMPAIGN_DETAIL_URL = "https://api.headhuntrai.com/api/job-searches/<campaign_id>/allJobs/";
 const CHANGE_CAMPAIGN_OVERALL_OR_EMAIL_STATUS_URL = "https://api.headhuntrai.com/api/campaign/<campaign_id>/status/";
 

@@ -9,7 +9,7 @@ import axios from 'axios';
 
 const BASE_URL = 'https://api.headhuntrai.com/api';
 const GET_ACTIVE_CAMPAIGN_DETAILS_URL = `${BASE_URL}/job-searches/<user_id>/activeJobs/`;
-const GET_ACTIVE_CAMPAIGN_DETAILS_URL_PROXY = `https://headhuntrai.com/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
+const GET_ACTIVE_CAMPAIGN_DETAILS_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
 const SET_CAMPAIGNS_AS_READ = `${BASE_URL}/update-job-notification/`;
 
 const Layout = () => {
