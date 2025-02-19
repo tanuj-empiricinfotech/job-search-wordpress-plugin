@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { timeAgo } from '../helper';
 
 const GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL = "https://api.headhuntrai.com/api/job-searches/<campaign_id>/appliedJobs/";
+const GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/applied-jobs-proxy/<campaign_id>`;
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL = "https://api.headhuntrai.com/api/job-searches/<user_id>/activeJobs/";
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
 const UPDATE_LIKE_STATUS_OF_JOB_URL = "https://api.headhuntrai.com/api/like-status/<job_id>/";
@@ -23,7 +24,7 @@ function AppliedJobs({ globalAuthUserDetails }) {
     const [allDetailsLoading, setAllDetailsLoading] = useState(false);
 
     const fetchActiveCampaignAppliedJobDetails = async (campaignId) => {
-        const finalURL = GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL.replace("<campaign_id>", campaignId);
+        const finalURL = GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL_PROXY.replace("<campaign_id>", campaignId);
         try {
             const response = await axios.get(finalURL);
             console.log('response----------------------', response);
@@ -33,8 +34,6 @@ function AppliedJobs({ globalAuthUserDetails }) {
             // if (error?.response?.data?.detail) {
             //     setNoActiveCampaign(true);
             // }
-        } finally {
-            setAllDetailsLoading(false);
         }
     }
 
@@ -44,14 +43,11 @@ function AppliedJobs({ globalAuthUserDetails }) {
         try {
             const response = await axios.get(finalURL);
             const data = typeof response?.data === 'string' ? JSON.parse(response?.data) : response?.data;
-            // console.log(data?.campaign?.id);
-            // console.log('calling fetchActiveCampaignAppliedJobDetails with ', data?.campaign?.id);
-            if (data?.campaign?.id) fetchActiveCampaignAppliedJobDetails(data?.campaign?.id);
+            if (data?.campaign?.id) await fetchActiveCampaignAppliedJobDetails(data?.campaign?.id);
         } catch (error) {
             console.error('Error fetching data:', error?.message);
-            // if (error?.response?.data?.detail) {
-            //     setNoActiveCampaign(true);
-            // }
+        } finally {
+            setAllDetailsLoading(false);
         }
     }
 
