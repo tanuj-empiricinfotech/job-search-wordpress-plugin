@@ -244,7 +244,7 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => '__return_true', // Set permissions (adjust as needed)
     ) );
     
-    register_rest_route( 'job-search/v1', '/campaign-list-proxy/(?P<user_id>\d+)', array( // Define endpoint and parameter
+    register_rest_route( 'job-search/v1', '/campaigns-list-proxy/(?P<user_id>\d+)', array( // Define endpoint and parameter
         'methods'  => 'GET', // Accept GET requests
         'callback' => 'get_campaign_list_proxy', // Callback function to handle requests
         'permission_callback' => '__return_true', // Set permissions (adjust as needed)
