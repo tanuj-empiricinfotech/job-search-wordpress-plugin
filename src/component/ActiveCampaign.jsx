@@ -210,13 +210,13 @@ function ActiveCampaign({ globalAuthUserDetails }) {
                                                 className="flex gap-2 items-center cursor-pointer"
                                                 onClick={(e) => isJobApplied ? e.preventDefault() : downloadFile(e, downloadedFiles.doc || job?.files[0].id)}
                                             >
-                                                <i className="pi pi-file-word text-blue-600"></i>Download CV as Word
+                                                <i className="pi pi-file-word text-blue-600"></i>Generate CV as Word <span className='p-1'><i className="pi pi-download text-blue-600 animate-pulse"></i></span>
                                             </span>
                                             <span
                                                 className="flex gap-2 items-center cursor-pointer"
                                                 onClick={(e) => isJobApplied ? e.preventDefault() : downloadFile(e, downloadedFiles.pdf || job?.files[1].id)}
                                             >
-                                                <i className="pi pi-file-pdf text-red-600"></i>Download CV as PDF
+                                                <i className="pi pi-file-pdf text-red-600"></i>Generate CV as PDF <span className='p-1'><i className="pi pi-download text-blue-600 animate-pulse"></i></span>
                                             </span>
                                         </>
                                 }
@@ -236,8 +236,8 @@ function ActiveCampaign({ globalAuthUserDetails }) {
 
         const StickyHeader = () => {
             return (
-                <div className="sticky top-0 bg-brand-primary text-white shadow-md p-4 z-[100]">
-                    <div className="flex flex-col gap-2">
+                <div className="sticky top-0 bg-brand-primary text-white shadow-md p-2 z-[100]">
+                    <div className="flex flex-col">
                         <div className="grid grid-cols-2 sm:grid-cols-4 text-[13px] sm:text-base">
                             <span className="">
                                 Total Jobs : {activeCampaignDetails?.last_seven_days_job_count}
@@ -251,18 +251,15 @@ function ActiveCampaign({ globalAuthUserDetails }) {
                             <span className="">
                                 Applied Jobs : {activeCampaignDetails?.apply_count}
                             </span>
-                        </div>
-                        <div className="grid grid-cols-1 text-[11px] sm:text-sm">
                             <span className="capitalize">
                                 City : {activeCampaignDetails?.campaign?.city}
                             </span>
-                            {/* <span className="">
-                                Email : {activeCampaignDetails?.campaign?.email}
-                            </span> */}
                             <span className="">
                                 Required Jobs : {activeCampaignDetails?.campaign?.keyword}
                             </span>
                         </div>
+                        {/* <div className="flex gap-x-[114px] flex-wrap text-[11px] sm:text-sm">
+                        </div> */}
                     </div>
                 </div>
             );

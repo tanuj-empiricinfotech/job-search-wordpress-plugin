@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP React Page Template
  * Description: A custom page template rendered using ReactJS.
- * Version: 1.0.21
+ * Version: 1.0.22
  * Author: Empiric Infotech LLP
  * License: GPL2
  */
@@ -367,10 +367,6 @@ function get_applied_jobs_proxy( $request ) {
     $status  = wp_remote_retrieve_response_code( $response );
     $headers = wp_remote_retrieve_headers( $response );
     $data = json_decode( $body, true ); // Decode JSON response
-
-    // if ( json_last_error() !== JSON_ERROR_NONE ) {
-    //     return new WP_Error( 'json_error', 'Error decoding JSON response from external API', array( 'status' => 500 ) );
-    // }
 
     if ($status !== 200) {
         return new WP_REST_Response( $data, $status );

@@ -226,8 +226,8 @@ function AppliedJobs({ globalAuthUserDetails }) {
 
         const StickyHeader = () => {
             return (
-                <div className="sticky top-0 bg-brand-primary text-white shadow-md p-4 z-[100]">
-                    <div className="flex flex-col gap-2">
+                <div className="sticky top-0 bg-brand-primary text-white shadow-md p-2 z-[100]">
+                    <div className="flex flex-col">
                         <div className="grid grid-cols-3 text-[13px] sm:text-base">
                             <span className="">
                                 Total Jobs : {activeCampaignDetails?.total_job_count}
@@ -239,13 +239,10 @@ function AppliedJobs({ globalAuthUserDetails }) {
                                 Applied Jobs : {activeCampaignDetails?.jobs?.length}
                             </span>
                         </div>
-                        <div className="grid grid-cols-1 text-[11px] sm:text-sm">
+                        <div className="flex gap-2 flex-wrap text-[11px] sm:text-sm">
                             <span className="capitalize">
                                 City : {activeCampaignDetails?.campaign?.city}
                             </span>
-                            {/* <span className="">
-                                Email : {activeCampaignDetails?.campaign?.email}
-                            </span> */}
                             <span className="">
                                 Required Jobs : {activeCampaignDetails?.campaign?.keyword}
                             </span>
