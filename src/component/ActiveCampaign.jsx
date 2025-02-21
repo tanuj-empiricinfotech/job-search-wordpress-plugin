@@ -5,6 +5,7 @@ import { timeAgo } from '../helper';
 const GET_ACTIVE_CAMPAIGN_DETAILS_URL = "https://api.headhuntrai.com/api/job-searches/<user_id>/activeJobs/";
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
 const UPDATE_LIKE_STATUS_OF_JOB_URL = "https://api.headhuntrai.com/api/like-status/<job_id>/";
+const UPDATE_LIKE_STATUS_OF_JOB_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/update-job-like-proxy/<job_id>`;
 const APPLY_TO_JOB_URL = "https://api.headhuntrai.com/api/apply-status/<job_id>/";
 const GENERATE_FILES_URL = "https://api.headhuntrai.com/api/generate-resume/<job_id>/";
 const DOWNLOAD_FILES_URL = "https://api.headhuntrai.com/api/download-resume/<file_id>/";
@@ -51,7 +52,7 @@ function ActiveCampaign({ globalAuthUserDetails }) {
             e.preventDefault();
             e.stopPropagation();
             setJobUpdating(true);
-            const finalURL = UPDATE_LIKE_STATUS_OF_JOB_URL.replace("<job_id>", job?.id);
+            const finalURL = UPDATE_LIKE_STATUS_OF_JOB_URL_PROXY.replace("<job_id>", job?.id);
             try {
                 const data = new FormData();
                 data.append("is_liked", newStatus);

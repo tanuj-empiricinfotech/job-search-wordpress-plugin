@@ -6,7 +6,6 @@ const GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL = "https://api.headhuntrai.com
 const GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/applied-jobs-proxy/<campaign_id>`;
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL = "https://api.headhuntrai.com/api/job-searches/<user_id>/activeJobs/";
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
-const UPDATE_LIKE_STATUS_OF_JOB_URL = "https://api.headhuntrai.com/api/like-status/<job_id>/";
 const APPLY_TO_JOB_URL = "https://api.headhuntrai.com/api/apply-status/<job_id>/";
 const GENERATE_FILES_URL = "https://api.headhuntrai.com/api/generate-resume/<job_id>/";
 const DOWNLOAD_FILES_URL = "https://api.headhuntrai.com/api/download-resume/<file_id>/";
@@ -54,23 +53,6 @@ function AppliedJobs({ globalAuthUserDetails }) {
         const [jobUpdating, setJobUpdating] = useState(false);
         const [appliedJobs, setAppliedJobs] = useState([...(job.is_applied ? [job.id] : [])]);
         const isJobApplied = job.is_applied || appliedJobs.includes(job.id);
-
-        const updateLikeStatus = async (e, newStatus) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setJobUpdating(true);
-            const finalURL = UPDATE_LIKE_STATUS_OF_JOB_URL.replace("<job_id>", job?.id);
-            try {
-                const data = new FormData();
-                data.append("is_liked", newStatus);
-                const response = await axios.post(finalURL, data);
-                fetchActiveCampaignDetails();
-            } catch (error) {
-                console.error('Error updating status:', error);
-            } finally {
-                setJobUpdating(false);
-            }
-        }
 
         const applyToJob = async (e, newStatus) => {
             e.preventDefault();

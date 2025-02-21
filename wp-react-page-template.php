@@ -255,6 +255,20 @@ add_action( 'rest_api_init', function () {
         'callback' => 'get_applied_jobs_proxy', // Callback function to handle requests
         'permission_callback' => '__return_true', // Set permissions (adjust as needed)
     ) );
+
+    register_rest_route( 'job-search/v1', '/update-job-like-proxy/(?P<job_id>\d+)', array(
+        'methods'  => 'POST',
+        'callback' => 'update_campaignjob_like_proxy',
+        'permission_callback' => '__return_true',
+        'args' => array(
+            'is_liked' => array(
+                'required' => true,
+                'validate_callback' => function($param, $request, $key) {
+                    return is_bool($request->get_json_params()[$key]);
+                }
+            )
+        )
+    ) );
 });
   
 function fetch_country_list_proxy( WP_REST_Request $request ) {
@@ -374,4 +388,30 @@ function get_applied_jobs_proxy( $request ) {
     }
 
     return rest_ensure_response($data);
+}
+
+function update_campaignjob_like_proxy( WP_REST_Request $request ) {
+    $job_id = $request->get_param('job_id');
+    $status = $request->get_json_params()['is_liked'];
+
+    $api_url = 'https://api.headhuntrai.com/api/like-status/' . $job_id;
+
+    $response = wp_remote_post( $api_url, array(
+        'headers' => array( 'Content-Type' => 'application/json' ),
+        'body' => wp_json_encode( array( 'is_liked' => $status ) )
+    ) );
+
+    if ( is_wp_error( $response ) ) {
+        return new WP_Error( 'api_error', 'Failed to update campaign status', array( 'status' => 500 ) );
+    }
+
+    $body = wp_remote_retrieve_body( $response );
+    $data = json_decode( $body, true ); // Decode JSON response
+
+    if ( is_null( $data ) && !empty( $body ) ) {
+        // Handle cases where the body is not valid JSON but not empty (e.g., HTML error page)
+        return new WP_Error( 'api_error', 'Failed to update campaign status', array( 'status' => 500 ) );
+    }
+
+    return rest_ensure_response( $data );
 }
