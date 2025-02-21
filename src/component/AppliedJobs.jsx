@@ -7,7 +7,9 @@ const GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL_PROXY = `${wpAjax.site_url}/wp
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL = "https://api.headhuntrai.com/api/job-searches/<user_id>/activeJobs/";
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
 const APPLY_TO_JOB_URL = "https://api.headhuntrai.com/api/apply-status/<job_id>/";
+const APPLY_TO_JOB_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/update-job-applied-proxy/<job_id>`;
 const GENERATE_FILES_URL = "https://api.headhuntrai.com/api/generate-resume/<job_id>/";
+const GENERATE_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/generate-cv-proxy/<job_id>`;
 const DOWNLOAD_FILES_URL = "https://api.headhuntrai.com/api/download-resume/<file_id>/";
 
 const Loader = () => {
@@ -58,7 +60,7 @@ function AppliedJobs({ globalAuthUserDetails }) {
             e.preventDefault();
             e.stopPropagation();
             setJobUpdating(true);
-            const finalURL = APPLY_TO_JOB_URL.replace("<job_id>", job?.id);
+            const finalURL = APPLY_TO_JOB_URL_PROXY.replace("<job_id>", job?.id);
             try {
                 const data = new FormData();
                 data.append("is_applied", newStatus);
@@ -80,7 +82,7 @@ function AppliedJobs({ globalAuthUserDetails }) {
             e.preventDefault();
             e.stopPropagation();
             setJobUpdating(true);
-            const finalURL = GENERATE_FILES_URL.replace("<job_id>", job?.id);
+            const finalURL = GENERATE_FILES_URL_PROXY.replace("<job_id>", job?.id);
             try {
                 const response = await axios.get(finalURL);
                 fetchActiveCampaignDetails();

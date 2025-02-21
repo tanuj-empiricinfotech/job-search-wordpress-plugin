@@ -7,13 +7,20 @@ const GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY = `${wpAjax.site_url}/wp-json/job-sea
 const UPDATE_LIKE_STATUS_OF_JOB_URL = "https://api.headhuntrai.com/api/like-status/<job_id>/";
 const UPDATE_LIKE_STATUS_OF_JOB_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/update-job-like-proxy/<job_id>`;
 const APPLY_TO_JOB_URL = "https://api.headhuntrai.com/api/apply-status/<job_id>/";
+const APPLY_TO_JOB_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/update-job-applied-proxy/<job_id>`;
 const GENERATE_FILES_URL = "https://api.headhuntrai.com/api/generate-resume/<job_id>/";
+const GENERATE_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/generate-cv-proxy/<job_id>`;
 const DOWNLOAD_FILES_URL = "https://api.headhuntrai.com/api/download-resume/<file_id>/";
 
-const Loader = () => {
+const Loader = ({ generatingProgress = false }) => {
     return (
-        <div className="flex items-center justify-center min-h-[172px]">
+        <div className="flex flex-col items-center justify-center min-h-[172px] gap-y-2">
             <i className="pi pi-spinner-dotted text-4xl animate-spin"></i>
+            {
+                generatingProgress ? (
+                    <span className='text-lg animate-pulse'>Generating CV, Please Wait...</span>
+                ) : null
+            }
         </div>
     );
 }
@@ -42,6 +49,7 @@ function ActiveCampaign({ globalAuthUserDetails }) {
 
     const JobCard = ({ job }) => {
         const [jobUpdating, setJobUpdating] = useState(false);
+        const [generatingProgress, setGeneratingProgress] = useState(false);
         const [likedJobs, setLikedJobs] = useState([...(job.is_liked ? [job.id] : [])]);
         const [appliedJobs, setAppliedJobs] = useState([...(job.is_applied ? [job.id] : [])]);
         const [downloadedFiles, setDownloadedFiles] = useState({ pdf: job?.files?.[1]?.id || 0, doc: job?.files?.[0]?.id || 0 });
@@ -79,7 +87,7 @@ function ActiveCampaign({ globalAuthUserDetails }) {
             e.preventDefault();
             e.stopPropagation();
             setJobUpdating(true);
-            const finalURL = APPLY_TO_JOB_URL.replace("<job_id>", job?.id);
+            const finalURL = APPLY_TO_JOB_URL_PROXY.replace("<job_id>", job?.id);
             try {
                 const data = new FormData();
                 data.append("is_applied", newStatus);
@@ -106,7 +114,8 @@ function ActiveCampaign({ globalAuthUserDetails }) {
             e.preventDefault();
             e.stopPropagation();
             setJobUpdating(true);
-            const finalURL = GENERATE_FILES_URL.replace("<job_id>", job?.id);
+            setGeneratingProgress(true);
+            const finalURL = GENERATE_FILES_URL_PROXY.replace("<job_id>", job?.id);
             try {
                 const response = await axios.get(finalURL);
                 console.log('Files: ', { pdf: response.data.pdf_file_id, doc: response.data.word_file_id });
@@ -116,6 +125,7 @@ function ActiveCampaign({ globalAuthUserDetails }) {
                 console.error('Error generating files:', error?.message);
                 alert('Error generating files, Please try again.');
             } finally {
+                setGeneratingProgress(false);
                 setJobUpdating(false);
             }
         }
@@ -139,7 +149,7 @@ function ActiveCampaign({ globalAuthUserDetails }) {
             >
                 {
                     jobUpdating ?
-                        <Loader />
+                        <Loader generatingProgress={generatingProgress} />
                         :
                         <>
                             <div className="">

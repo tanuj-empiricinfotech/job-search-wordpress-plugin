@@ -256,18 +256,22 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => '__return_true', // Set permissions (adjust as needed)
     ) );
 
+    register_rest_route( 'job-search/v1', '/generate-cv-proxy/(?P<job_id>\d+)', array( // Define endpoint and parameter
+        'methods'  => 'GET', // Accept GET requests
+        'callback' => 'get_generate_cv_proxy', // Callback function to handle requests
+        'permission_callback' => '__return_true', // Set permissions (adjust as needed)
+    ) );
+
     register_rest_route( 'job-search/v1', '/update-job-like-proxy/(?P<job_id>\d+)', array(
         'methods'  => 'POST',
-        'callback' => 'update_campaignjob_like_proxy',
+        'callback' => 'update_job_like_proxy',
         'permission_callback' => '__return_true',
-        'args' => array(
-            'is_liked' => array(
-                'required' => true,
-                'validate_callback' => function($param, $request, $key) {
-                    return is_bool($request->get_json_params()[$key]);
-                }
-            )
-        )
+    ) );
+
+    register_rest_route( 'job-search/v1', '/update-job-applied-proxy/(?P<job_id>\d+)', array(
+        'methods'  => 'POST',
+        'callback' => 'update_job_applied_proxy',
+        'permission_callback' => '__return_true',
     ) );
 });
   
@@ -390,19 +394,19 @@ function get_applied_jobs_proxy( $request ) {
     return rest_ensure_response($data);
 }
 
-function update_campaignjob_like_proxy( WP_REST_Request $request ) {
+function update_job_like_proxy( WP_REST_Request $request ) {
     $job_id = $request->get_param('job_id');
-    $status = $request->get_json_params()['is_liked'];
+    $body = json_encode($request->get_json_params());
 
     $api_url = 'https://api.headhuntrai.com/api/like-status/' . $job_id;
 
     $response = wp_remote_post( $api_url, array(
         'headers' => array( 'Content-Type' => 'application/json' ),
-        'body' => wp_json_encode( array( 'is_liked' => $status ) )
+        'body' => $body
     ) );
 
     if ( is_wp_error( $response ) ) {
-        return new WP_Error( 'api_error', 'Failed to update campaign status', array( 'status' => 500 ) );
+        return new WP_Error( 'api_error', 'Failed to update job status', array( 'status' => 500 ) );
     }
 
     $body = wp_remote_retrieve_body( $response );
@@ -410,8 +414,57 @@ function update_campaignjob_like_proxy( WP_REST_Request $request ) {
 
     if ( is_null( $data ) && !empty( $body ) ) {
         // Handle cases where the body is not valid JSON but not empty (e.g., HTML error page)
-        return new WP_Error( 'api_error', 'Failed to update campaign status', array( 'status' => 500 ) );
+        return new WP_Error( 'api_error', 'Failed to update job status', array( 'status' => 500 ) );
     }
 
     return rest_ensure_response( $data );
+}
+
+function update_job_applied_proxy( WP_REST_Request $request ) {
+    $job_id = $request->get_param('job_id');
+    $body = json_encode($request->get_json_params());
+
+    $api_url = 'https://api.headhuntrai.com/api/apply-status/' . $job_id;
+
+    $response = wp_remote_post( $api_url, array(
+        'headers' => array( 'Content-Type' => 'application/json' ),
+        'body' => $body
+    ) );
+
+    if ( is_wp_error( $response ) ) {
+        return new WP_Error( 'api_error', 'Failed to update job status', array( 'status' => 500 ) );
+    }
+
+    $body = wp_remote_retrieve_body( $response );
+    $data = json_decode( $body, true ); // Decode JSON response
+
+    if ( is_null( $data ) && !empty( $body ) ) {
+        // Handle cases where the body is not valid JSON but not empty (e.g., HTML error page)
+        return new WP_Error( 'api_error', 'Failed to update job status', array( 'status' => 500 ) );
+    }
+
+    return rest_ensure_response( $data );
+}
+
+function get_generate_cv_proxy( $request ) {
+    $job_id = $request['job_id'];
+    $api_url = str_replace( '<job_id>', $job_id, 'https://api.headhuntrai.com/api/generate-resume/<job_id>/' );
+
+    $response = wp_remote_get( $api_url, array( 'timeout' => 60 * 3 ) );
+
+    if ( is_wp_error( $response ) ) {
+        return new WP_Error( 'api_error', 'Error generating cv from external API', array( 'status' => 500 ) );
+    }
+
+    $body = wp_remote_retrieve_body( $response );
+    $status  = wp_remote_retrieve_response_code( $response );
+    $headers = wp_remote_retrieve_headers( $response );
+    $data = json_decode( $body, true ); // Decode JSON response
+
+    if ($status !== 200) {
+        return new WP_REST_Response( $data, $status );
+        // return new WP_Error( 'error', $data, array( 'status' => $status ) );
+    }
+
+    return rest_ensure_response($data);
 }
