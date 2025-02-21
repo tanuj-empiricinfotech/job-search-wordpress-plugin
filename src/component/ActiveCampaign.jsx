@@ -21,13 +21,12 @@ function ActiveCampaign({ globalAuthUserDetails }) {
     const [activeCampaignDetails, setActiveCampaignDetails] = useState(null);
     const [noActiveCampaign, setNoActiveCampaign] = useState(false);
     const [activeCampaignLoading, setActiveCampaignLoading] = useState(false);
-    const fieldsToExclude = ['id', 'user_id', 'resume', 'created_at', 'updated_at', 'email', 'user_name', 'distance'];
 
     const fetchActiveCampaignDetails = async () => {
         setActiveCampaignLoading(true);
         const finalURL = GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY.replace("<user_id>", globalAuthUserDetails?.id);
         try {
-            const response = await axios.get(finalURL);
+            const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
             const data = typeof response?.data === 'string' ? JSON.parse(response?.data) : response?.data;
             setActiveCampaignDetails(data);
         } catch (error) {

@@ -26,13 +26,12 @@ function AppliedJobs({ globalAuthUserDetails }) {
     const fetchActiveCampaignAppliedJobDetails = async (campaignId) => {
         const finalURL = GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL_PROXY.replace("<campaign_id>", campaignId);
         try {
-            const response = await axios.get(finalURL);
-            console.log('response----------------------', response);
+            const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
             setAllDetails(response?.data);
         } catch (error) {
             console.error('Error fetching data:', error);
+            setNoActiveCampaign(true);
             // if (error?.response?.data?.detail) {
-            //     setNoActiveCampaign(true);
             // }
         }
     }
@@ -41,7 +40,7 @@ function AppliedJobs({ globalAuthUserDetails }) {
         setAllDetailsLoading(true);
         const finalURL = GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY.replace("<user_id>", globalAuthUserDetails?.id);
         try {
-            const response = await axios.get(finalURL);
+            const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
             const data = typeof response?.data === 'string' ? JSON.parse(response?.data) : response?.data;
             if (data?.campaign?.id) await fetchActiveCampaignAppliedJobDetails(data?.campaign?.id);
         } catch (error) {

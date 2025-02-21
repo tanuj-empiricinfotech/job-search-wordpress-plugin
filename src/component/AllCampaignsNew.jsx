@@ -419,7 +419,7 @@ function AllCampaignsNew({ globalAuthUserDetails, setSelectedTab }) {
         setCampaignDetailsLoading(true);
         const finalURL = GET_USERS_CAMPAIGN_LIST_URL_PROXY.replace("<user_id>", globalAuthUserDetails?.id);
         try {
-            const response = await axios.get(finalURL);
+            const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
             setAllCampaignDetails(response?.data);
         } catch (error) {
             console.error('Error fetching data:', error);

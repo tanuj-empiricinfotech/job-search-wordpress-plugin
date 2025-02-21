@@ -68,7 +68,7 @@ const Layout = () => {
     const fetchActiveCampaignDetails = async () => {
         const finalURL = GET_ACTIVE_CAMPAIGN_DETAILS_URL_PROXY.replace("<user_id>", globalAuthUserDetails?.id);
         try {
-            const response = await axios.get(finalURL);
+            const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
 
             if (response?.data) {
                 const data = typeof response?.data === 'string' ? JSON.parse(response?.data) : response?.data;
