@@ -11,6 +11,7 @@ const APPLY_TO_JOB_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/update-
 const GENERATE_FILES_URL = "https://api.headhuntrai.com/api/generate-resume/<job_id>/";
 const GENERATE_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/generate-cv-proxy/<job_id>`;
 const DOWNLOAD_FILES_URL = "https://api.headhuntrai.com/api/download-resume/<file_id>/";
+const DOWNLOAD_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/download-resume-proxy/<file_id>/`;
 
 const Loader = ({ generatingProgress = false }) => {
     return (
@@ -130,11 +131,12 @@ function ActiveCampaign({ globalAuthUserDetails }) {
             }
         }
 
-        const downloadFile = async (e, fileId) => {
-            e.preventDefault();
-            e.stopPropagation();
+        const downloadFile = (fileId) => {
+            // e.preventDefault();
+            // e.stopPropagation();
             const finalURL = DOWNLOAD_FILES_URL.replace("<file_id>", fileId);
-            window.open(finalURL, "_blank");
+            // window.open(finalURL, "_blank");
+            return finalURL;
         }
 
         return (
@@ -216,18 +218,22 @@ function ActiveCampaign({ globalAuthUserDetails }) {
                                         </>
                                         :
                                         <>
-                                            <span
+                                            <a
                                                 className="flex gap-2 items-center cursor-pointer"
-                                                onClick={(e) => isJobApplied ? e.preventDefault() : downloadFile(e, downloadedFiles.doc || job?.files[0].id)}
+                                                // onClick={(e) => isJobApplied ? e.preventDefault() : downloadFile(e, downloadedFiles.doc || job?.files[0].id)}
+                                                href={isJobApplied ? '#' : downloadFile(downloadedFiles.doc || job?.files[0].id)}
+                                                download=""
                                             >
                                                 <i className="pi pi-file-word text-blue-600"></i>Generate CV as Word <span className='p-1'><i className="pi pi-download text-blue-600 animate-pulse"></i></span>
-                                            </span>
-                                            <span
+                                            </a>
+                                            <a
                                                 className="flex gap-2 items-center cursor-pointer"
-                                                onClick={(e) => isJobApplied ? e.preventDefault() : downloadFile(e, downloadedFiles.pdf || job?.files[1].id)}
+                                                // onClick={(e) => isJobApplied ? e.preventDefault() : downloadFile(e, downloadedFiles.pdf || job?.files[1].id)}
+                                                href={isJobApplied ? '#' : downloadFile(downloadedFiles.pdf || job?.files[1].id)}
+                                                download=""
                                             >
                                                 <i className="pi pi-file-pdf text-red-600"></i>Generate CV as PDF <span className='p-1'><i className="pi pi-download text-blue-600 animate-pulse"></i></span>
-                                            </span>
+                                            </a>
                                         </>
                                 }
                             </div>

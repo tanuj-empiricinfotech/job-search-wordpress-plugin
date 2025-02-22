@@ -11,6 +11,7 @@ const APPLY_TO_JOB_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/update-
 const GENERATE_FILES_URL = "https://api.headhuntrai.com/api/generate-resume/<job_id>/";
 const GENERATE_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/generate-cv-proxy/<job_id>`;
 const DOWNLOAD_FILES_URL = "https://api.headhuntrai.com/api/download-resume/<file_id>/";
+const DOWNLOAD_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/download-resume-proxy/<file_id>/`;
 
 const Loader = () => {
     return (
@@ -53,6 +54,7 @@ function AppliedJobs({ globalAuthUserDetails }) {
 
     const JobCard = ({ job }) => {
         const [jobUpdating, setJobUpdating] = useState(false);
+        const [downloadedFiles, setDownloadedFiles] = useState({ pdf: job?.files?.[1]?.id || 0, doc: job?.files?.[0]?.id || 0 });
         const [appliedJobs, setAppliedJobs] = useState([...(job.is_applied ? [job.id] : [])]);
         const isJobApplied = job.is_applied || appliedJobs.includes(job.id);
 
@@ -85,6 +87,7 @@ function AppliedJobs({ globalAuthUserDetails }) {
             const finalURL = GENERATE_FILES_URL_PROXY.replace("<job_id>", job?.id);
             try {
                 const response = await axios.get(finalURL);
+                setDownloadedFiles({ pdf: response.data.pdf_file_id, doc: response.data.word_file_id });
                 fetchActiveCampaignDetails();
             } catch (error) {
                 console.error('Error generating files:', error);
@@ -93,11 +96,9 @@ function AppliedJobs({ globalAuthUserDetails }) {
             }
         }
 
-        const downloadFile = async (e, fileId) => {
-            e.preventDefault();
-            e.stopPropagation();
+        const downloadFile = (fileId) => {
             const finalURL = DOWNLOAD_FILES_URL.replace("<file_id>", fileId);
-            window.open(finalURL, "_blank");
+            return finalURL;
         }
 
         return (
@@ -162,35 +163,39 @@ function AppliedJobs({ globalAuthUserDetails }) {
                             {/* Show Download options */}
                             <div className='grid grid-cols-1'>
                                 {
-                                    job?.files?.length === 0 ?
+                                    (!downloadedFiles.pdf && !downloadedFiles.doc) ?
                                         <>
                                             <span
                                                 className="flex gap-1 items-center cursor-pointer"
-                                                onClick={(e) => job?.is_applied ? e.preventDefault() : generateFiles(e)}
+                                                onClick={(e) => isJobApplied ? e.preventDefault() : generateFiles(e)}
                                             >
                                                 <i className="pi pi-file-word text-blue-600"></i>Generate CV as Word
                                             </span>
                                             <span
                                                 className="flex gap-1 items-center cursor-pointer"
-                                                onClick={(e) => job?.is_applied ? e.preventDefault() : generateFiles(e)}
+                                                onClick={(e) => isJobApplied ? e.preventDefault() : generateFiles(e)}
                                             >
                                                 <i className="pi pi-file-pdf text-red-600"></i>Generate CV as PDF
                                             </span>
                                         </>
                                         :
                                         <>
-                                            <span
+                                            <a
                                                 className="flex gap-2 items-center cursor-pointer"
-                                                onClick={(e) => job?.is_applied ? e.preventDefault() : downloadFile(e, job?.files[0].id)}
+                                                // onClick={(e) => isJobApplied ? e.preventDefault() : downloadFile(e, downloadedFiles.doc || job?.files[0].id)}
+                                                href={isJobApplied ? '#' : downloadFile(downloadedFiles.doc || job?.files[0].id)}
+                                                download=""
                                             >
-                                                <i className="pi pi-file-word text-blue-600"></i>Download CV as Word
-                                            </span>
-                                            <span
+                                                <i className="pi pi-file-word text-blue-600"></i>Generate CV as Word <span className='p-1'><i className="pi pi-download text-blue-600 animate-pulse"></i></span>
+                                            </a>
+                                            <a
                                                 className="flex gap-2 items-center cursor-pointer"
-                                                onClick={(e) => job?.is_applied ? e.preventDefault() : downloadFile(e, job?.files[1].id)}
+                                                // onClick={(e) => isJobApplied ? e.preventDefault() : downloadFile(e, downloadedFiles.pdf || job?.files[1].id)}
+                                                href={isJobApplied ? '#' : downloadFile(downloadedFiles.pdf || job?.files[1].id)}
+                                                download=""
                                             >
-                                                <i className="pi pi-file-pdf text-red-600"></i>Download CV as PDF
-                                            </span>
+                                                <i className="pi pi-file-pdf text-red-600"></i>Generate CV as PDF <span className='p-1'><i className="pi pi-download text-blue-600 animate-pulse"></i></span>
+                                            </a>
                                         </>
                                 }
                             </div>

@@ -249,6 +249,12 @@ add_action( 'rest_api_init', function () {
         'callback' => 'get_campaign_list_proxy', // Callback function to handle requests
         'permission_callback' => '__return_true', // Set permissions (adjust as needed)
     ) );
+    
+    register_rest_route( 'job-search/v1', '/campaigns-detail-proxy/(?P<campaign_id>\d+)', array( // Define endpoint and parameter
+        'methods'  => 'GET', // Accept GET requests
+        'callback' => 'get_campaign_detail_proxy', // Callback function to handle requests
+        'permission_callback' => '__return_true', // Set permissions (adjust as needed)
+    ) );
 
     register_rest_route( 'job-search/v1', '/applied-jobs-proxy/(?P<campaign_id>\d+)', array( // Define endpoint and parameter
         'methods'  => 'GET', // Accept GET requests
@@ -261,6 +267,12 @@ add_action( 'rest_api_init', function () {
         'callback' => 'get_generate_cv_proxy', // Callback function to handle requests
         'permission_callback' => '__return_true', // Set permissions (adjust as needed)
     ) );
+
+    register_rest_route( 'job-search/v1', '/download-resume-proxy/(?P<file_id>\d+)', array(
+        'methods'             => 'GET',
+        'callback'            => 'download_generated_cv_proxy',
+        'permission_callback' => '__return_true', // For production, add proper permission checks.
+    ));
 
     register_rest_route( 'job-search/v1', '/update-job-like-proxy/(?P<job_id>\d+)', array(
         'methods'  => 'POST',
@@ -371,6 +383,32 @@ function get_campaign_list_proxy( $request ) {
     return rest_ensure_response($data);
 }
 
+function get_campaign_detail_proxy( $request ) {
+    $campaign_id = $request['campaign_id'];
+    $api_url = str_replace( '<campaign_id>', $campaign_id, 'https://api.headhuntrai.com/api/job-searches/<campaign_id>/allJobs/' );
+
+    $response = wp_remote_get( $api_url );
+
+    if ( is_wp_error( $response ) ) {
+        return new WP_Error( 'api_error', 'Error fetching campaign list from external API', array( 'status' => 500 ) );
+    }
+
+    $body = wp_remote_retrieve_body( $response );
+    $status  = wp_remote_retrieve_response_code( $response );
+    $headers = wp_remote_retrieve_headers( $response );
+    $data = json_decode( $body, true ); // Decode JSON response
+
+    if ( json_last_error() !== JSON_ERROR_NONE ) {
+        return new WP_Error( 'json_error', 'Error decoding JSON response from external API', array( 'status' => 500 ) );
+    }
+
+    if ($status !== 200) {
+        return new WP_Error( 'error', $data, array( 'status' => $status ) );
+    }
+
+    return rest_ensure_response($data);
+}
+
 function get_applied_jobs_proxy( $request ) {
     $campaign_id = $request['campaign_id'];
     $api_url = str_replace( '<campaign_id>', $campaign_id, 'https://api.headhuntrai.com/api/job-searches/<campaign_id>/appliedJobs/' );
@@ -451,6 +489,29 @@ function get_generate_cv_proxy( $request ) {
     $api_url = str_replace( '<job_id>', $job_id, 'https://api.headhuntrai.com/api/generate-resume/<job_id>/' );
 
     $response = wp_remote_get( $api_url, array( 'timeout' => 60 * 3 ) );
+
+    if ( is_wp_error( $response ) ) {
+        return new WP_Error( 'api_error', 'Error generating cv from external API', array( 'status' => 500 ) );
+    }
+
+    $body = wp_remote_retrieve_body( $response );
+    $status  = wp_remote_retrieve_response_code( $response );
+    $headers = wp_remote_retrieve_headers( $response );
+    $data = json_decode( $body, true ); // Decode JSON response
+
+    if ($status !== 200) {
+        return new WP_REST_Response( $data, $status );
+        // return new WP_Error( 'error', $data, array( 'status' => $status ) );
+    }
+
+    return rest_ensure_response($data);
+}
+
+function download_generated_cv_proxy( $request ) {
+    $file_id = $request['file_id'];
+    $api_url = str_replace( '<file_id>', $file_id, 'https://api.headhuntrai.com/api/download-resume/<file_id>/' );
+
+    $response = wp_remote_get( $api_url );
 
     if ( is_wp_error( $response ) ) {
         return new WP_Error( 'api_error', 'Error generating cv from external API', array( 'status' => 500 ) );
