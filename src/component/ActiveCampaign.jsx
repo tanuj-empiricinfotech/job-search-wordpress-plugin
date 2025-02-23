@@ -134,7 +134,7 @@ function ActiveCampaign({ globalAuthUserDetails }) {
         const downloadFile = (fileId) => {
             // e.preventDefault();
             // e.stopPropagation();
-            const finalURL = DOWNLOAD_FILES_URL.replace("<file_id>", fileId);
+            const finalURL = DOWNLOAD_FILES_URL_PROXY.replace("<file_id>", fileId);
             // window.open(finalURL, "_blank");
             return finalURL;
         }

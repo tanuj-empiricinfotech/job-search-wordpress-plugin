@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP React Page Template
  * Description: A custom page template rendered using ReactJS.
- * Version: 1.0.22
+ * Version: 1.0.23
  * Author: Empiric Infotech LLP
  * License: GPL2
  */
@@ -555,7 +555,7 @@ function get_generate_cv_proxy( $request ) {
     $job_id = $request['job_id'];
     $api_url = str_replace( '<job_id>', $job_id, 'https://api.headhuntrai.com/api/generate-resume/<job_id>/' );
 
-    $response = wp_remote_get( $api_url, ['timeout' => 60 * 3] );
+    $response = wp_remote_get( $api_url, ['timeout' => 60 * 3 ] );
 
     if ( is_wp_error( $response ) ) {
         return new WP_Error( 'api_error', 'Error generating cv from external API', array( 'status' => 500 ) );
@@ -579,20 +579,37 @@ function download_generated_cv_proxy( $request ) {
     $api_url = str_replace( '<file_id>', $file_id, 'https://api.headhuntrai.com/api/download-resume/<file_id>/' );
 
     $response = wp_remote_get( $api_url );
-
-    if ( is_wp_error( $response ) ) {
-        return new WP_Error( 'api_error', 'Error generating cv from external API', array( 'status' => 500 ) );
+    $response_code = wp_remote_retrieve_response_code( $response );
+    
+    if ( is_wp_error( $response ) || $response_code !== 200 ) {
+        return new WP_Error( 'download_error', 'Unable to retrieve file. HTTP Code: ' . $response_code, array( 'status' => $response_code ) );
     }
-
-    $body = wp_remote_retrieve_body( $response );
-    $status  = wp_remote_retrieve_response_code( $response );
+    
     $headers = wp_remote_retrieve_headers( $response );
-    $data = json_decode( $body, true ); // Decode JSON response
-
-    if ($status !== 200) {
-        return new WP_REST_Response( $data, $status );
-        // return new WP_Error( 'error', $data, array( 'status' => $status ) );
+    $body    = wp_remote_retrieve_body( $response );
+    
+    if ( empty( $body ) ) {
+        return new WP_Error( 'empty_file', 'No file content found.', array( 'status' => 404 ) );
     }
-
-    return rest_ensure_response($data);
+    
+    // Clean up any previous output buffering to ensure file integrity
+    if ( ob_get_length() ) {
+        ob_end_clean();
+    }
+    
+    // Set headers for the download. Use external headers if available; otherwise, set defaults.
+    $content_type = isset( $headers['content-type'] ) ? $headers['content-type'] : 'application/octet-stream';
+    if ( isset( $headers['content-disposition'] ) ) {
+        $content_disposition = $headers['content-disposition'];
+    } else {
+        // Fallback filename
+        $content_disposition = 'attachment; filename="downloaded_file.pdf"';
+    }
+    
+    header( 'Content-Type: ' . $content_type );
+    header( 'Content-Disposition: ' . $content_disposition );
+    
+    // Output the file content and terminate execution
+    echo $body;
+    exit;
 }

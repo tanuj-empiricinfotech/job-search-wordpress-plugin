@@ -138,7 +138,7 @@ const CampaignDetailModal = ({ detailsModalOpen, setDetailsModalOpen, campaignId
         }
 
         const downloadFile = (fileId) => {
-            const finalURL = DOWNLOAD_FILES_URL.replace("<file_id>", fileId);
+            const finalURL = DOWNLOAD_FILES_URL_PROXY.replace("<file_id>", fileId);
             return finalURL;
         }
 
