@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP React Page Template
  * Description: A custom page template rendered using ReactJS.
- * Version: 1.0.23
+ * Version: 1.0.24
  * Author: Empiric Infotech LLP
  * License: GPL2
  */
@@ -471,7 +471,6 @@ function update_job_applied_proxy( WP_REST_Request $request ) {
     }
 }
 
-
 function update_job_notification_proxy( WP_REST_Request $request ) {
     try {
         $body = json_encode($request->get_json_params());
@@ -529,7 +528,7 @@ function get_generate_cv_proxy( $request ) {
         $api_url = str_replace( '<job_id>', $job_id, 'https://api.headhuntrai.com/api/generate-resume/<job_id>/' );
     
         $response = wp_remote_get( $api_url, ['timeout' => 60 * 3 ] );
-        
+
         $body = wp_remote_retrieve_body( $response );
         $status  = wp_remote_retrieve_response_code( $response );
         $headers = wp_remote_retrieve_headers( $response );

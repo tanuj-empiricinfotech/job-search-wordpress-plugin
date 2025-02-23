@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Dialog } from "primereact/dialog";
 import React, { useEffect, useState } from 'react';
-import { timeAgo } from '../helper';
+import { pastTense, timeAgo } from '../helper';
 import "./AllCampaigns.css";
 
 const GET_USERS_CAMPAIGN_LIST_URL = "https://api.headhuntrai.com/api/campaign-list/<user_id>/";
@@ -20,10 +20,15 @@ const APPLY_TO_JOB_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/update-
 const GENERATE_FILES_URL = "https://api.headhuntrai.com/api/generate-resume/<job_id>/";
 const GENERATE_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/generate-cv-proxy/<job_id>`;
 
-const Loader = () => {
+const Loader = ({ generatingProgress = false }) => {
     return (
-        <div className="flex items-center justify-center min-h-[94px]">
+        <div className="flex flex-col items-center justify-center min-h-[94px] gap-y-2">
             <i className="pi pi-spinner text-4xl animate-spin"></i>
+            {
+                generatingProgress ? (
+                    <span className='text-lg animate-pulse'>Generating CV, Please Wait...</span>
+                ) : null
+            }
         </div>
     );
 }
@@ -37,7 +42,7 @@ const CampaignDetailModal = ({ detailsModalOpen, setDetailsModalOpen, campaignId
         setModalDataLoading(true);
         try {
             // Make the API request with the current params (pagination, sorting, and filters)
-            const response = await axios.get(finalURL);
+            const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
             setIndividualCampaignDetail(response?.data);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -124,8 +129,7 @@ const CampaignDetailModal = ({ detailsModalOpen, setDetailsModalOpen, campaignId
             setGeneratingProgress(true);
             const finalURL = GENERATE_FILES_URL_PROXY.replace("<job_id>", job?.id);
             try {
-                const response = await axios.get(finalURL);
-                console.log('Files: ', { pdf: response.data.pdf_file_id, doc: response.data.word_file_id });
+                const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
                 setDownloadedFiles({ pdf: response.data.pdf_file_id, doc: response.data.word_file_id });
                 // fetchActiveCampaignDetails();
             } catch (error) {
@@ -309,37 +313,16 @@ const CampaignDetailModal = ({ detailsModalOpen, setDetailsModalOpen, campaignId
     const FullDataComp = () => {
         const fieldsToExclude = ['id', 'user_id', 'user_name', 'email', 'city', 'country', 'email_status', 'industry', 'keyword', 'distance', 'resume', 'created_at', 'updated_at'];
         return (
-            <div className="flex flex-col mt-6">
+            <div className="flex flex-col mt-2">
                 {/* Campaign Details */}
                 <span className="text-xl underline text-brand-primary mb-4">Campaign Details</span>
                 <div className="grid grid-cols-2 sm:grid-cols-3 mb-6 gap-x-4 gap-y-4">
-                    {
-                        Object.keys(individualCampaignDetail?.campaign).length > 0
-                        &&
-                        Object.keys(individualCampaignDetail?.campaign).map((key) => {
-                            if (fieldsToExclude.includes(key)) return;
-                            const val = individualCampaignDetail?.campaign[key];
-                            return (
-                                <div className="flex flex-col gap-1">
-                                    <span className="capitalize">{key.split("_").join(" ")}</span>
-                                    <span className="p-2 text-sm border-solid border-[1px] border-gray-300 rounded-lg overflow-hidden text-ellipsis">
-                                        {
-                                            val === null ?
-                                                <span>&nbsp;</span>
-                                                :
-                                                val === false ?
-                                                    <span>Off</span>
-                                                    :
-                                                    val === true ?
-                                                        <span>On</span>
-                                                        :
-                                                        val
-                                        }
-                                    </span>
-                                </div>
-                            );
-                        })
-                    }
+                    <div className="flex flex-col gap-1">
+                        <span className="capitalize">Status</span>
+                        <span className="p-2 text-sm border-solid border-[1px] border-gray-300 rounded-lg overflow-hidden text-ellipsis">
+                            {pastTense(individualCampaignDetail?.campaign?.overall_status)}
+                        </span>
+                    </div>
                 </div>
                 <hr />
                 {/* Jobs Details */}
@@ -354,6 +337,7 @@ const CampaignDetailModal = ({ detailsModalOpen, setDetailsModalOpen, campaignId
             maximized
             header=""
             visible={detailsModalOpen}
+            headerClassName='mt-8'
             style={{ backgroundColor: "white", color: "black" }}
             onHide={() => { if (!detailsModalOpen) return; setDetailsModalOpen(false); }} className="p-2"
         >

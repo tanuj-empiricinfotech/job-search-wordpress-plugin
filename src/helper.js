@@ -21,3 +21,20 @@ export function timeAgo(dateString) {
     }
     return "just now";
 }
+
+export function pastTense(str) {
+    if (typeof str !== 'string') return str;
+    switch (str.toUpperCase()) {
+        case 'STOP':
+            return 'STOPPED'
+            break;
+
+        case 'PAUSE':
+            return 'PAUSED'
+            break;
+
+        default:
+            return str;
+            break;
+    }
+}

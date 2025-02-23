@@ -13,10 +13,15 @@ const GENERATE_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/gener
 const DOWNLOAD_FILES_URL = "https://api.headhuntrai.com/api/download-resume/<file_id>/";
 const DOWNLOAD_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/download-resume-proxy/<file_id>/`;
 
-const Loader = () => {
+const Loader = ({ generatingProgress = false }) => {
     return (
         <div className="flex items-center justify-center min-h-[194px] w-full">
             <i className="pi pi-spinner-dotted text-4xl animate-spin"></i>
+            {
+                generatingProgress ? (
+                    <span className='text-lg animate-pulse'>Generating CV, Please Wait...</span>
+                ) : null
+            }
         </div>
     );
 }
@@ -86,7 +91,7 @@ function AppliedJobs({ globalAuthUserDetails }) {
             setJobUpdating(true);
             const finalURL = GENERATE_FILES_URL_PROXY.replace("<job_id>", job?.id);
             try {
-                const response = await axios.get(finalURL);
+                const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
                 setDownloadedFiles({ pdf: response.data.pdf_file_id, doc: response.data.word_file_id });
                 fetchActiveCampaignDetails();
             } catch (error) {

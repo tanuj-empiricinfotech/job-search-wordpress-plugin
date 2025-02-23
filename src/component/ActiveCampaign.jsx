@@ -118,8 +118,7 @@ function ActiveCampaign({ globalAuthUserDetails }) {
             setGeneratingProgress(true);
             const finalURL = GENERATE_FILES_URL_PROXY.replace("<job_id>", job?.id);
             try {
-                const response = await axios.get(finalURL);
-                console.log('Files: ', { pdf: response.data.pdf_file_id, doc: response.data.word_file_id });
+                const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
                 setDownloadedFiles({ pdf: response.data.pdf_file_id, doc: response.data.word_file_id });
                 // fetchActiveCampaignDetails();
             } catch (error) {
