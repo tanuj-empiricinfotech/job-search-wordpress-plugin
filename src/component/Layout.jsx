@@ -11,6 +11,7 @@ const BASE_URL = 'https://api.headhuntrai.com/api';
 const GET_ACTIVE_CAMPAIGN_DETAILS_URL = `${BASE_URL}/job-searches/<user_id>/activeJobs/`;
 const GET_ACTIVE_CAMPAIGN_DETAILS_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
 const SET_CAMPAIGNS_AS_READ = `${BASE_URL}/update-job-notification/`;
+const SET_CAMPAIGNS_AS_READ_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/update-job-notification-proxy/`;
 
 const Layout = () => {
     const globalAuthUserDetails = JSON.parse(authUser);
@@ -85,7 +86,7 @@ const Layout = () => {
     async function handleMarkCampaignsAsRead() {
         try {
             if (!Array.isArray(unreadCampaigns) || unreadCampaigns.length === 0) return;
-            const result = await axios.post(SET_CAMPAIGNS_AS_READ, { search: unreadCampaigns[0]?.search });
+            const result = await axios.post(SET_CAMPAIGNS_AS_READ_PROXY, { search: unreadCampaigns[0]?.search });
             console.log('campaigns marked as read', result);
             if (result.status === 200) setUnreadCampaigns([]);
         } catch (error) {

@@ -285,6 +285,12 @@ add_action( 'rest_api_init', function () {
         'callback' => 'update_job_applied_proxy',
         'permission_callback' => '__return_true',
     ) );
+
+    register_rest_route( 'job-search/v1', '/update-job-notification-proxy/', array(
+        'methods'  => 'POST',
+        'callback' => 'update_job_notification_proxy',
+        'permission_callback' => '__return_true',
+    ) );
 });
   
 function fetch_country_list_proxy( WP_REST_Request $request ) {
@@ -479,6 +485,32 @@ function update_job_applied_proxy( WP_REST_Request $request ) {
     if ( is_null( $data ) && !empty( $body ) ) {
         // Handle cases where the body is not valid JSON but not empty (e.g., HTML error page)
         return new WP_Error( 'api_error', 'Failed to update job status', array( 'status' => 500 ) );
+    }
+
+    return rest_ensure_response( $data );
+}
+
+
+function update_job_notification_proxy( WP_REST_Request $request ) {
+    $body = json_encode($request->get_json_params());
+
+    $api_url = 'https://api.headhuntrai.com/api/update-job-notification/';
+
+    $response = wp_remote_post( $api_url, array(
+        'headers' => array( 'Content-Type' => 'application/json' ),
+        'body' => $body
+    ) );
+
+    if ( is_wp_error( $response ) ) {
+        return new WP_Error( 'api_error', 'Failed to update job notification status', array( 'status' => 500 ) );
+    }
+
+    $body = wp_remote_retrieve_body( $response );
+    $data = json_decode( $body, true ); // Decode JSON response
+
+    if ( is_null( $data ) && !empty( $body ) ) {
+        // Handle cases where the body is not valid JSON but not empty (e.g., HTML error page)
+        return new WP_Error( 'api_error', 'Failed to update job notification status', array( 'status' => 500 ) );
     }
 
     return rest_ensure_response( $data );
