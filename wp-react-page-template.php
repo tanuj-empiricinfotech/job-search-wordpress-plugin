@@ -291,6 +291,12 @@ add_action( 'rest_api_init', function () {
         'callback' => 'update_job_notification_proxy',
         'permission_callback' => '__return_true',
     ) );
+
+    register_rest_route( 'job-search/v1', '/campaign-status-proxy/(?P<campaign_id>\d+)', array(
+        'methods'  => 'POST',
+        'callback' => 'update_campaign_status_proxy',
+        'permission_callback' => '__return_true',
+    ) );
 });
   
 function fetch_country_list_proxy( WP_REST_Request $request ) {
@@ -516,11 +522,40 @@ function update_job_notification_proxy( WP_REST_Request $request ) {
     return rest_ensure_response( $data );
 }
 
+function update_campaign_status_proxy( WP_REST_Request $request ) {
+    try {
+        $campaign_id = $request->get_param('campaign_id');
+        $body = json_encode($request->get_body_params());
+
+        $api_url = "https://api.headhuntrai.com/api/campaign/$campaign_id/status/";
+
+        $response = wp_remote_post( $api_url, array(
+            'method' => 'PATCH',
+            'headers' => array( 'Content-Type' => 'application/json' ),
+            'body' => $body
+        ) );
+
+        $status = wp_remote_retrieve_response_code( $response );
+        $body = wp_remote_retrieve_body( $response );
+
+        if ( is_wp_error( $response ) || empty( $body ) ) {
+            return new WP_Error( 'api_error', $body, array( 'status' => $status ) );
+        }
+
+        $data = json_decode( $body, true ); // Decode JSON response
+
+        // return rest_ensure_response( $data );
+        return new WP_REST_Response( $data, $status );
+    } catch (\Throwable $th) {
+        return new WP_Error( 'api_error', 'Failed to update campaign status', array( 'status' => 500 ) );
+    }
+}
+
 function get_generate_cv_proxy( $request ) {
     $job_id = $request['job_id'];
     $api_url = str_replace( '<job_id>', $job_id, 'https://api.headhuntrai.com/api/generate-resume/<job_id>/' );
 
-    $response = wp_remote_get( $api_url, array( 'timeout' => 60 * 3 ) );
+    $response = wp_remote_get( $api_url, ['timeout' => 60 * 3] );
 
     if ( is_wp_error( $response ) ) {
         return new WP_Error( 'api_error', 'Error generating cv from external API', array( 'status' => 500 ) );

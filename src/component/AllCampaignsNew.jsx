@@ -9,6 +9,7 @@ const GET_USERS_CAMPAIGN_LIST_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search
 const GET_CAMPAIGN_DETAIL_URL = "https://api.headhuntrai.com/api/job-searches/<campaign_id>/allJobs/";
 const GET_CAMPAIGN_DETAIL_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/campaigns-detail-proxy/<campaign_id>/`;
 const CHANGE_CAMPAIGN_OVERALL_OR_EMAIL_STATUS_URL = "https://api.headhuntrai.com/api/campaign/<campaign_id>/status/";
+const CHANGE_CAMPAIGN_OVERALL_OR_EMAIL_STATUS_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/campaign-status-proxy/<campaign_id>/`;
 const DOWNLOAD_FILES_URL = "https://api.headhuntrai.com/api/download-resume/<file_id>/";
 const DOWNLOAD_FILES_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/download-resume-proxy/<file_id>/`;
 
@@ -412,10 +413,10 @@ const CampaignCard = ({ campaign, handleModalOpen, setSelectedTab, fetchAllCampa
             }
         }
 
-        const finalURL = CHANGE_CAMPAIGN_OVERALL_OR_EMAIL_STATUS_URL.replace("<campaign_id>", campaignId);
+        const finalURL = CHANGE_CAMPAIGN_OVERALL_OR_EMAIL_STATUS_URL_PROXY.replace("<campaign_id>", campaignId);
         setCampaignUpdating(true);
         try {
-            const response = await axios.patch(finalURL, data);
+            const response = await axios.post(finalURL, data);
             setCampaignUpdating(false);
             // fetchAllCampaigns();
             updateActionStates();
@@ -579,7 +580,7 @@ function AllCampaignsNew({ globalAuthUserDetails, setSelectedTab }) {
         <div className="!mt-8 !px-3">
             <div className="!my-4">
                 <h2 className="!text-2xl !text-brand-primary">
-                    Hello {globalAuthUserDetails.username}, {allCampaignDetails?.length > 0 ? 'Below are all your campaigns' : "You don\'t have any campaign"}
+                    Hello {globalAuthUserDetails.username}, {campaignDetailsLoading ? "Looking for your campaigns..." : (allCampaignDetails?.length > 0 ? 'Below are all your campaigns' : "You don\'t have any campaign")}
                 </h2>
                 {
                     campaignDetailsLoading ?
