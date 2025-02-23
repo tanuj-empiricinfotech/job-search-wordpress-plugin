@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP React Page Template
  * Description: A custom page template rendered using ReactJS.
- * Version: 1.0.24
+ * Version: 1.0.25
  * Author: Empiric Infotech LLP
  * License: GPL2
  */
@@ -256,7 +256,7 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => '__return_true', // Set permissions (adjust as needed)
     ) );
 
-    register_rest_route( 'job-search/v1', '/applied-jobs-proxy/(?P<campaign_id>\d+)', array( // Define endpoint and parameter
+    register_rest_route( 'job-search/v1', '/applied-jobs-proxy/(?P<user_id>\d+)', array( // Define endpoint and parameter
         'methods'  => 'GET', // Accept GET requests
         'callback' => 'get_applied_jobs_proxy', // Callback function to handle requests
         'permission_callback' => '__return_true', // Set permissions (adjust as needed)
@@ -405,8 +405,8 @@ function get_campaign_detail_proxy( $request ) {
 
 function get_applied_jobs_proxy( $request ) {
     try {
-        $campaign_id = $request['campaign_id'];
-        $api_url = str_replace( '<campaign_id>', $campaign_id, 'https://api.headhuntrai.com/api/job-searches/<campaign_id>/appliedJobs/' );
+        $user_id = $request['user_id'];
+        $api_url = str_replace( '<user_id>', $user_id, 'https://api.headhuntrai.com/api/job-searches/<user_id>/appliedJobs/' );
     
         $response = wp_remote_get( $api_url );
         $body = wp_remote_retrieve_body( $response );

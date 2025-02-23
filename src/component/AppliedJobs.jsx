@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { timeAgo } from '../helper';
 
 const GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL = "https://api.headhuntrai.com/api/job-searches/<campaign_id>/appliedJobs/";
-const GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/applied-jobs-proxy/<campaign_id>`;
+const GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/applied-jobs-proxy/<user_id>/`;
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL = "https://api.headhuntrai.com/api/job-searches/<user_id>/activeJobs/";
 const GET_ACTIVE_CAMPAIGN_DETAIL_URL_PROXY = `${wpAjax.site_url}/wp-json/job-search/v1/active-jobs-proxy/<user_id>/`;
 const APPLY_TO_JOB_URL = "https://api.headhuntrai.com/api/apply-status/<job_id>/";
@@ -30,16 +30,14 @@ function AppliedJobs({ globalAuthUserDetails }) {
     const [allDetails, setAllDetails] = useState(null);
     const [allDetailsLoading, setAllDetailsLoading] = useState(false);
 
-    const fetchActiveCampaignAppliedJobDetails = async (campaignId) => {
-        const finalURL = GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL_PROXY.replace("<campaign_id>", campaignId);
+    const fetchActiveCampaignAppliedJobDetails = async (userId) => {
+        const finalURL = GET_ACTIVE_CAMPAIGN_APPLIED_JOB_DETAILS_URL_PROXY.replace("<user_id>", userId);
         try {
             const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
             setAllDetails(response?.data);
         } catch (error) {
             console.error('Error fetching data:', error);
             setNoActiveCampaign(true);
-            // if (error?.response?.data?.detail) {
-            // }
         }
     }
 
@@ -49,7 +47,7 @@ function AppliedJobs({ globalAuthUserDetails }) {
         try {
             const response = await axios.get(`${finalURL}?v=${new Date().getTime()}`);
             const data = typeof response?.data === 'string' ? JSON.parse(response?.data) : response?.data;
-            if (data?.campaign?.id) await fetchActiveCampaignAppliedJobDetails(data?.campaign?.id);
+            if (data?.campaign?.user_id) await fetchActiveCampaignAppliedJobDetails(data?.campaign?.user_id);
         } catch (error) {
             console.error('Error fetching data:', error?.message);
         } finally {
@@ -231,14 +229,12 @@ function AppliedJobs({ globalAuthUserDetails }) {
                             <span className="">
                                 Applied Jobs : {activeCampaignDetails?.jobs?.length}
                             </span>
-                        </div>
-                        <div className="flex gap-2 flex-wrap text-[11px] sm:text-sm">
-                            <span className="capitalize">
+                            {/* <span className="capitalize">
                                 City : {activeCampaignDetails?.campaign?.city}
                             </span>
-                            <span className="">
+                            <span className="col-span-2">
                                 Required Jobs : {activeCampaignDetails?.campaign?.keyword}
-                            </span>
+                            </span> */}
                         </div>
                     </div>
                 </div>
