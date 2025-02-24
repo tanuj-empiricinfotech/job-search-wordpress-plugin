@@ -61,27 +61,27 @@ function AppliedJobs({ globalAuthUserDetails }) {
         const [appliedJobs, setAppliedJobs] = useState([...(job.is_applied ? [job.id] : [])]);
         const isJobApplied = job.is_applied || appliedJobs.includes(job.id);
 
-        const applyToJob = async (e, newStatus) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setJobUpdating(true);
-            const finalURL = APPLY_TO_JOB_URL_PROXY.replace("<job_id>", job?.id);
-            try {
-                const data = new FormData();
-                data.append("is_applied", newStatus);
-                const response = await axios.post(finalURL, data);
-                // fetchActiveCampaignDetails();
-                if (newStatus) {
-                    if (!appliedJobs.includes(job.id)) setAppliedJobs([...appliedJobs, job.id]);
-                } else {
-                    setAppliedJobs(appliedJobs.filter(id => id != job.id));
-                }
-            } catch (error) {
-                console.error('Error applying to job:', error);
-            } finally {
-                setJobUpdating(false);
-            }
-        }
+        // const applyToJob = async (e, newStatus) => {
+        //     e.preventDefault();
+        //     e.stopPropagation();
+        //     setJobUpdating(true);
+        //     const finalURL = APPLY_TO_JOB_URL_PROXY.replace("<job_id>", job?.id);
+        //     try {
+        //         const data = new FormData();
+        //         data.append("is_applied", newStatus);
+        //         const response = await axios.post(finalURL, data);
+        //         // fetchActiveCampaignDetails();
+        //         if (newStatus) {
+        //             if (!appliedJobs.includes(job.id)) setAppliedJobs([...appliedJobs, job.id]);
+        //         } else {
+        //             setAppliedJobs(appliedJobs.filter(id => id != job.id));
+        //         }
+        //     } catch (error) {
+        //         console.error('Error applying to job:', error);
+        //     } finally {
+        //         setJobUpdating(false);
+        //     }
+        // }
 
         const generateFiles = async (e) => {
             e.preventDefault();
@@ -149,7 +149,7 @@ function AppliedJobs({ globalAuthUserDetails }) {
                                 <span
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        applyToJob(e, !isJobApplied);
+                                        // applyToJob(e, !isJobApplied);
                                     }}
                                     className="flex gap-2 items-center cursor-pointer"
                                 >
