@@ -138,6 +138,14 @@ function ActiveCampaign({ globalAuthUserDetails }) {
             return finalURL;
         }
 
+        const generateDetailPageUrl = (detailPageUrl) => {
+            if (detailPageUrl?.includes('linkedin')) {
+                return detailPageUrl.includes("?") ? detailPageUrl + '&openExternalBrowser=1' : detailPageUrl + '?openExternalBrowser=1';
+            }
+            return detailPageUrl;
+        };
+
+
         return (
             <div
                 className={`flex flex-col p-6 text-base gap-1 justify-between rounded-lg ${isJobApplied && 'grayscale'}`}
@@ -155,7 +163,7 @@ function ActiveCampaign({ globalAuthUserDetails }) {
                         <>
                             <div className="">
                                 <span className="capitalize text-xl text-black">{job?.job_title}</span>
-                                {isJobApplied ? null : !!(job?.detail_page_url) ? <a href={job?.detail_page_url} target='_blank' className='text-xs pl-2 !underline'>View Job <i className='pi pi-external-link text-xxs' /></a> : null}
+                                {isJobApplied ? null : !!(job?.detail_page_url) ? <a href={generateDetailPageUrl(job?.detail_page_url)} target='_blank' className='text-xs pl-2 !underline'>View Job <i className='pi pi-external-link text-xxs' /></a> : null}
                             </div>
                             <span>
                                 {job?.company}
