@@ -1,0 +1,42 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Logs
+logs
+*.log
+
+# Build outputs
+dist/
+build/
+includes/
+out/
+.next/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Cache
+.cache/
+.nyc_output/
+coverage/
+.DS_Store
+
+# Electron-specific
+/electron-builder-cache/
+*.asar
+
+# Vscode settings
+.vscode/
+
+# OS-specific files
+Thumbs.db
+*.swp
+
+# Git
+.git/
+
+*.zip

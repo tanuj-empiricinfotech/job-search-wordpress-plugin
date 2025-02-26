@@ -176,10 +176,10 @@ function save_resume_file_and_get_url( $file, $user_id ) {
 function handle_job_search_ajax_request() {
     try {
         // Verify nonce for security
-        if ( !isset($_POST['nonce']) || !wp_verify_nonce( $_POST['nonce'], 'job_search_nonce' ) ) {
-            echo json_encode( array( 'message' => 'Invalid nonce' ) );
-            wp_die();
-        }
+        // if ( !isset($_POST['nonce']) || !wp_verify_nonce( $_POST['nonce'], 'job_search_nonce' ) ) {
+        //     echo json_encode( array( 'message' => 'Invalid nonce' ) );
+        //     wp_die();
+        // }
 
         // Get POST data from AJAX request
         $campaignCity = sanitize_text_field( $_POST['city'] );
